@@ -3,7 +3,7 @@
 const https = require('https');
 const { GEMINI_API_KEY } = require('../config/env');
 
-const MODEL = 'gemini-1.5-flash';
+const MODEL = 'gemini-2.0-flash';
 
 const PROMPT_TEMPLATE = (text, url, title) => `
 You are a job posting parser. Extract the following fields from the page text below and return ONLY a valid JSON object with these exact keys:
