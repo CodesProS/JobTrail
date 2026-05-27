@@ -13,6 +13,6 @@ module.exports = {
   PORT:         parseInt(optional('PORT', '3000'), 10),
   DATABASE_URL: required('DATABASE_URL'),
   JWT_SECRET:   required('JWT_SECRET'),
-  GEMINI_API_KEY: required('GEMINI_API_KEY'),
+  GROQ_API_KEY: required('GROQ_API_KEY'),
   ALLOWED_ORIGINS: optional('ALLOWED_ORIGINS', 'chrome-extension://'),
 };

@@ -1,12 +1,11 @@
-// src/services/claudeService.js — Gemini API integration for job extraction
+// src/services/claudeService.js — Groq API integration for job extraction
 
 const https = require('https');
-const { GEMINI_API_KEY } = require('../config/env');
+const { GROQ_API_KEY } = require('../config/env');
 
-const MODEL = 'gemini-2.0-flash-lite';
+const MODEL = 'llama-3.1-8b-instant'; // free, fast
 
-const PROMPT_TEMPLATE = (text, url, title) => `
-You are a job posting parser. Extract the following fields from the page text below and return ONLY a valid JSON object with these exact keys:
+const SYSTEM_PROMPT = `You are a job posting parser. Given raw text from a job board page, extract the following fields and return ONLY a valid JSON object with these exact keys:
 
 {
   "company": "Company name",
@@ -20,52 +19,34 @@ You are a job posting parser. Extract the following fields from the page text be
 Rules:
 - Return ONLY the JSON object, no markdown, no code fences, no commentary.
 - If a field cannot be found, use an empty string "".
-- For pay, include the currency symbol and range (e.g. "$120k–$150k").
+- For pay, include the currency symbol and range (e.g. "$120k–$150k").`;
 
-URL: ${url}
-Page title: ${title}
-
---- PAGE TEXT ---
-${text}
-`;
-
-/**
- * Extract structured job info from raw page text using Gemini.
- */
 async function extractJobData(text, url = '', title = '') {
   const body = JSON.stringify({
-    contents: [
-      {
-        parts: [{ text: PROMPT_TEMPLATE(text, url, title) }],
-      },
+    model: MODEL,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: `URL: ${url}\nPage title: ${title}\n\n--- PAGE TEXT ---\n${text}` },
     ],
-    generationConfig: {
-      temperature: 0.1,
-      maxOutputTokens: 512,
-    },
+    max_tokens: 512,
+    temperature: 0.1,
   });
 
-  const path = `/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
-  const raw = await httpsPost('generativelanguage.googleapis.com', path, body, {
+  const raw = await httpsPost('api.groq.com', '/openai/v1/chat/completions', body, {
     'Content-Type': 'application/json',
+    'Authorization': `Bearer ${GROQ_API_KEY}`,
   });
 
   const parsed = JSON.parse(raw);
+  if (parsed.error) throw new Error(parsed.error.message || 'Groq API error');
 
-  if (parsed.error) {
-    throw new Error(parsed.error.message || 'Gemini API error');
-  }
-
-  const content = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-  // Strip accidental markdown code fences
+  const content = parsed.choices?.[0]?.message?.content || '';
   const jsonText = content.replace(/```(?:json)?/g, '').trim();
 
   try {
     return JSON.parse(jsonText);
   } catch {
-    throw new Error('Gemini returned non-JSON response: ' + content.slice(0, 200));
+    throw new Error('Groq returned non-JSON response: ' + content.slice(0, 200));
   }
 }
 
