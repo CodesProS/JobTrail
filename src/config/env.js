@@ -13,7 +13,6 @@ module.exports = {
   PORT:         parseInt(optional('PORT', '3000'), 10),
   DATABASE_URL: required('DATABASE_URL'),
   JWT_SECRET:   required('JWT_SECRET'),
-  CLAUDE_API_KEY: required('CLAUDE_API_KEY'),
-  CLAUDE_MODEL: optional('CLAUDE_MODEL', 'claude-haiku-4-5-20251001'),
+  GEMINI_API_KEY: required('GEMINI_API_KEY'),
   ALLOWED_ORIGINS: optional('ALLOWED_ORIGINS', 'chrome-extension://'),
 };
