@@ -21,20 +21,20 @@ const jobRepository = {
     return res.rows[0] || null;
   },
 
-  async create({ userId, company, role, location, pay, link, notes, status, applied_date }) {
+  async create({ userId, company, role, location, pay, link, notes, status, applied_date, term }) {
     const res = await query(
       `INSERT INTO applications
-         (user_id, company, role, location, pay, link, notes, status, applied_date, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+         (user_id, company, role, location, pay, link, notes, status, applied_date, term, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
        RETURNING *`,
-      [userId, company, role, location || null, pay || null, link || null, notes || null, status || 'applied', applied_date || null]
+      [userId, company, role, location || null, pay || null, link || null, notes || null, status || 'applied', applied_date || null, term || null]
     );
     return res.rows[0];
   },
 
   async update(id, userId, fields) {
     // Build dynamic SET clause from provided fields
-    const allowed = ['company', 'role', 'location', 'pay', 'link', 'notes', 'status', 'applied_date'];
+    const allowed = ['company', 'role', 'location', 'pay', 'link', 'notes', 'status', 'applied_date', 'term'];
     const setClauses = [];
     const values = [];
     let idx = 1;

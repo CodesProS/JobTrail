@@ -42,7 +42,7 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { company, role, location, pay, link, notes, status, applied_date } = req.body;
+    const { company, role, location, pay, link, notes, status, applied_date, term } = req.body;
     if (!company || !role) {
       return res.status(400).json({ error: 'Company and role are required' });
     }
@@ -62,6 +62,7 @@ router.post('/', async (req, res, next) => {
       notes,
       status: status || 'applied',
       applied_date: applied_date || new Date().toISOString().slice(0, 10),
+      term,
     });
 
     res.status(201).json({ job });

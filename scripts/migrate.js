@@ -26,8 +26,12 @@ CREATE TABLE IF NOT EXISTS applications (
   status       TEXT NOT NULL DEFAULT 'applied'
                  CHECK (status IN ('applied','phone_screen','interview','offer','rejected','ghosted')),
   applied_date DATE,
+  term         TEXT,
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Add term column if upgrading existing DB
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS term TEXT;
 
 CREATE INDEX IF NOT EXISTS applications_user_id_idx ON applications (user_id);
 CREATE INDEX IF NOT EXISTS applications_status_idx  ON applications (status);
