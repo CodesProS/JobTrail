@@ -13,13 +13,15 @@ const SYSTEM_PROMPT = `You are a job posting parser. Given raw text from a job b
   "location": "Location or Remote (empty string if not found)",
   "pay": "Salary / compensation if mentioned (empty string if not found)",
   "url": "Job posting URL if present in text (empty string if not found)",
-  "notes": "Key requirements, tech stack, or notable details in 1-2 sentences (empty string if not found)"
+  "notes": "Key requirements, tech stack, or notable details in 1-2 sentences (empty string if not found)",
+  "term": "Internship/job term — one of: Summer 2026, Fall 2026, Spring 2027, Summer 2027, Fall 2027, Full-time. Infer from context (e.g. 'summer intern' → Summer 2026, 'new grad' or 'full time' → Full-time). Empty string if unclear."
 }
 
 Rules:
 - Return ONLY the JSON object, no markdown, no code fences, no commentary.
 - If a field cannot be found, use an empty string "".
-- For pay, include the currency symbol and range (e.g. "$120k–$150k").`;
+- For pay, include the currency symbol and range (e.g. "$120k–$150k").
+- For term, only use one of the listed values exactly as written, or empty string.`;
 
 async function extractJobData(text, url = '', title = '') {
   const body = JSON.stringify({
