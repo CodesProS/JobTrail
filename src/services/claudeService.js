@@ -24,13 +24,16 @@ Rules:
 - For term, only use one of the listed values exactly as written, or empty string.`;
 
 async function extractJobData(text, url = '', title = '') {
+  // Trim text to ~2000 chars to stay well within TPM limits
+  const trimmedText = text.slice(0, 2000);
+
   const body = JSON.stringify({
     model: MODEL,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `URL: ${url}\nPage title: ${title}\n\n--- PAGE TEXT ---\n${text}` },
+      { role: 'user', content: `URL: ${url}\nPage title: ${title}\n\n--- PAGE TEXT ---\n${trimmedText}` },
     ],
-    max_tokens: 512,
+    max_tokens: 256,
     temperature: 0.1,
   });
 
