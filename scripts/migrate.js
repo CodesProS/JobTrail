@@ -1,7 +1,7 @@
 // scripts/migrate.js — creates DB tables (run once on first deploy)
 
-require('dotenv').config();
-const { query, pool } = require('../src/config/database');
+import 'dotenv/config';
+import { query, pool } from '../src/config/database.js';
 
 const SQL = `
 CREATE TABLE IF NOT EXISTS users (

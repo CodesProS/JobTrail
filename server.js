@@ -1,12 +1,14 @@
 // server.js — JobTrail Express entry point
 
-require('dotenv').config();
+import 'dotenv/config';
 
-const express = require('express');
-const { PORT, ALLOWED_ORIGINS } = require('./src/config/env');
-const { errorHandler } = require('./src/middleware/errorHandler');
-const authRoutes = require('./src/routes/auth');
-const jobRoutes = require('./src/routes/jobs');
+import express from 'express';
+import env from './src/config/env.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
+import authRoutes from './src/routes/auth.js';
+import jobRoutes from './src/routes/jobs.js';
+
+const { PORT, ALLOWED_ORIGINS } = env;
 
 const app = express();
 
@@ -47,4 +49,4 @@ app.listen(PORT, () => {
   console.log(`[JobTrail API] Running on port ${PORT}`);
 });
 
-module.exports = app;
+export default app;
