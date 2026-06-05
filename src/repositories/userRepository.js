@@ -1,6 +1,6 @@
 // src/repositories/userRepository.js — user DB operations
 
-const { query } = require('../config/database');
+import { query } from '../config/database.js';
 
 const userRepository = {
   async findByEmail(email) {
@@ -24,4 +24,4 @@ const userRepository = {
   },
 };
 
-module.exports = userRepository;
+export default userRepository;

@@ -1,9 +1,9 @@
 // src/services/claudeService.js — Groq API integration for job extraction
 
-const https = require('https');
-const { GROQ_API_KEY } = require('../config/env');
+import https from 'https';
+import env from '../config/env.js';
 
-const MODEL = 'llama-3.1-8b-instant'; // free, fast
+const MODEL = 'llama-3.1-8b-instant';
 
 const SYSTEM_PROMPT = `You are a job posting parser. Given raw text from a job board page, extract the following fields and return ONLY a valid JSON object with these exact keys:
 
@@ -23,8 +23,7 @@ Rules:
 - For pay, include the currency symbol and range (e.g. "$120k–$150k").
 - For term, only use one of the listed values exactly as written, or empty string.`;
 
-async function extractJobData(text, url = '', title = '') {
-  // Trim text to ~2000 chars to stay well within TPM limits
+export async function extractJobData(text, url = '', title = '') {
   const trimmedText = text.slice(0, 2000);
 
   const body = JSON.stringify({
@@ -39,7 +38,7 @@ async function extractJobData(text, url = '', title = '') {
 
   const raw = await httpsPost('api.groq.com', '/openai/v1/chat/completions', body, {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${GROQ_API_KEY}`,
+    'Authorization': `Bearer ${env.GROQ_API_KEY}`,
   });
 
   const parsed = JSON.parse(raw);
@@ -75,5 +74,3 @@ function httpsPost(hostname, path, body, headers) {
     req.end();
   });
 }
-
-module.exports = { extractJobData };

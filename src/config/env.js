@@ -8,7 +8,7 @@ const required = (key) => {
 
 const optional = (key, defaultVal = '') => process.env[key] || defaultVal;
 
-module.exports = {
+export default {
   NODE_ENV:     optional('NODE_ENV', 'development'),
   PORT:         parseInt(optional('PORT', '3000'), 10),
   DATABASE_URL: required('DATABASE_URL'),

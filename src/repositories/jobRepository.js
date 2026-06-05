@@ -1,13 +1,11 @@
 // src/repositories/jobRepository.js — job applications DB operations
 
-const { query } = require('../config/database');
+import { query } from '../config/database.js';
 
 const jobRepository = {
   async findAll(userId) {
     const res = await query(
-      `SELECT * FROM applications
-       WHERE user_id = $1
-       ORDER BY updated_at DESC`,
+      `SELECT * FROM applications WHERE user_id = $1 ORDER BY updated_at DESC`,
       [userId]
     );
     return res.rows;
@@ -33,7 +31,6 @@ const jobRepository = {
   },
 
   async update(id, userId, fields) {
-    // Build dynamic SET clause from provided fields
     const allowed = ['company', 'role', 'location', 'pay', 'link', 'notes', 'status', 'applied_date', 'term'];
     const setClauses = [];
     const values = [];
@@ -71,4 +68,4 @@ const jobRepository = {
   },
 };
 
-module.exports = jobRepository;
+export default jobRepository;

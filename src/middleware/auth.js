@@ -1,8 +1,8 @@
 // src/middleware/auth.js — JWT authentication middleware
 
-const { verify } = require('../utils/jwt');
+import { verify } from '../utils/jwt.js';
 
-function requireAuth(req, res, next) {
+export function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Authorization header missing or malformed' });
@@ -11,11 +11,9 @@ function requireAuth(req, res, next) {
   const token = authHeader.slice(7);
   try {
     const payload = verify(token);
-    req.user = payload; // { userId, email, iat, exp }
+    req.user = payload;
     next();
   } catch (err) {
     return res.status(401).json({ error: err.message });
   }
 }
-
-module.exports = { requireAuth };

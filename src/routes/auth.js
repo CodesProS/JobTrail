@@ -1,20 +1,17 @@
 // src/routes/auth.js — register + login
 
-const express = require('express');
-const crypto = require('crypto');
-const userRepository = require('../repositories/userRepository');
-const { sign } = require('../utils/jwt');
+import { Router } from 'express';
+import crypto from 'crypto';
+import userRepository from '../repositories/userRepository.js';
+import { sign } from '../utils/jwt.js';
 
-const router = express.Router();
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
+const router = Router();
 
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// ── POST /auth/register ───────────────────────────────────────────────────────
-
+// POST /auth/register
 router.post('/register', async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
@@ -43,8 +40,7 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-// ── POST /auth/login ──────────────────────────────────────────────────────────
-
+// POST /auth/login
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -74,4 +70,4 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

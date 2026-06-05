@@ -1,25 +1,21 @@
-// src/routes/jobs.js — job CRUD + Claude extraction
+// src/routes/jobs.js — job CRUD + Groq extraction
 
-const express = require('express');
-const { requireAuth } = require('../middleware/auth');
-const jobRepository = require('../repositories/jobRepository');
-const { extractJobData } = require('../services/claudeService');
+import { Router } from 'express';
+import { requireAuth } from '../middleware/auth.js';
+import jobRepository from '../repositories/jobRepository.js';
+import { extractJobData } from '../services/claudeService.js';
 
-const router = express.Router();
+const router = Router();
 
-// All job routes require auth
 router.use(requireAuth);
 
-// ── POST /jobs/extract ─────────────────────────────────────────────────────────
-// Send page text → Claude → returns structured job fields (does NOT save)
-
+// POST /jobs/extract
 router.post('/extract', async (req, res, next) => {
   try {
     const { text, url, title } = req.body;
     if (!text || text.trim().length < 50) {
       return res.status(400).json({ error: 'Page text is too short to extract job info' });
     }
-
     const job = await extractJobData(text, url, title);
     res.json({ job });
   } catch (err) {
@@ -27,8 +23,7 @@ router.post('/extract', async (req, res, next) => {
   }
 });
 
-// ── GET /jobs ──────────────────────────────────────────────────────────────────
-
+// GET /jobs
 router.get('/', async (req, res, next) => {
   try {
     const jobs = await jobRepository.findAll(req.user.userId);
@@ -38,8 +33,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// ── POST /jobs ─────────────────────────────────────────────────────────────────
-
+// POST /jobs
 router.post('/', async (req, res, next) => {
   try {
     const { company, role, location, pay, link, notes, status, applied_date, term } = req.body;
@@ -56,10 +50,7 @@ router.post('/', async (req, res, next) => {
       userId: req.user.userId,
       company: company.trim(),
       role: role.trim(),
-      location,
-      pay,
-      link,
-      notes,
+      location, pay, link, notes,
       status: status || 'applied',
       applied_date: applied_date || new Date().toISOString().slice(0, 10),
       term,
@@ -71,12 +62,10 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// ── PATCH /jobs/:id ────────────────────────────────────────────────────────────
-
+// PATCH /jobs/:id
 router.patch('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
-
     const existing = await jobRepository.findById(id, req.user.userId);
     if (!existing) {
       return res.status(404).json({ error: 'Application not found' });
@@ -94,8 +83,7 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
-// ── DELETE /jobs/:id ───────────────────────────────────────────────────────────
-
+// DELETE /jobs/:id
 router.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -109,4 +97,4 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

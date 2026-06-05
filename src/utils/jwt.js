@@ -1,7 +1,7 @@
 // src/utils/jwt.js — raw JWT using Node's crypto module (no libraries)
 
-const crypto = require('crypto');
-const { JWT_SECRET } = require('../config/env');
+import crypto from 'crypto';
+import env from '../config/env.js';
 
 const ALGORITHM = 'HS256';
 const EXPIRY_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -15,19 +15,18 @@ function base64urlEncode(str) {
 }
 
 function base64urlDecode(str) {
-  // Pad back to standard base64
   const padded = str + '='.repeat((4 - (str.length % 4)) % 4);
   return Buffer.from(padded.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
 }
 
-function sign(payload) {
+export function sign(payload) {
   const header = base64urlEncode(JSON.stringify({ alg: ALGORITHM, typ: 'JWT' }));
   const now = Math.floor(Date.now() / 1000);
   const body = base64urlEncode(
     JSON.stringify({ ...payload, iat: now, exp: now + EXPIRY_SECONDS })
   );
   const signature = crypto
-    .createHmac('sha256', JWT_SECRET)
+    .createHmac('sha256', env.JWT_SECRET)
     .update(`${header}.${body}`)
     .digest('base64')
     .replace(/=/g, '')
@@ -37,7 +36,7 @@ function sign(payload) {
   return `${header}.${body}.${signature}`;
 }
 
-function verify(token) {
+export function verify(token) {
   if (!token || typeof token !== 'string') throw new Error('No token provided');
 
   const parts = token.split('.');
@@ -45,9 +44,8 @@ function verify(token) {
 
   const [header, body, signature] = parts;
 
-  // Verify signature
   const expected = crypto
-    .createHmac('sha256', JWT_SECRET)
+    .createHmac('sha256', env.JWT_SECRET)
     .update(`${header}.${body}`)
     .digest('base64')
     .replace(/=/g, '')
@@ -63,7 +61,6 @@ function verify(token) {
     throw new Error('Invalid signature');
   }
 
-  // Decode and check expiry
   const payload = JSON.parse(base64urlDecode(body));
   if (payload.exp < Math.floor(Date.now() / 1000)) {
     throw new Error('Token expired');
@@ -71,5 +68,3 @@ function verify(token) {
 
   return payload;
 }
-
-module.exports = { sign, verify };
