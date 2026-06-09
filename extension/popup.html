@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobTrail</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─── AUTH SCREEN ─────────────────────────────────── -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-logo">
+      <h1>JobTrail 🗂</h1>
+      <p>Track every application. Miss nothing.</p>
+    </div>
+
+    <div class="auth-form">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">Sign In</div>
+        <div class="auth-tab" data-tab="register">Register</div>
+      </div>
+
+      <div id="register-name-group" class="form-group" style="display:none">
+        <label for="auth-name">Name</label>
+        <input type="text" id="auth-name" placeholder="Your name" autocomplete="name" />
+      </div>
+
+      <div class="form-group">
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <div id="auth-error" class="auth-error"></div>
+
+      <button id="auth-submit" class="btn btn-primary btn-full">Sign In</button>
+    </div>
+  </div>
+
+  <!-- ─── DASHBOARD SCREEN ─────────────────────────────── -->
+  <div id="dashboard-screen" class="screen">
+    <div class="header">
+      <div class="header-logo">
+        <span class="dot"></span>
+        JobTrail
+      </div>
+      <div class="header-actions">
+        <button id="add-job-btn" class="btn btn-primary btn-sm">+ Add Job</button>
+        <button id="logout-btn" class="btn btn-ghost" title="Sign out">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard-body">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-active">0</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-interviews">0</div>
+          <div class="stat-label">Interviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-offers">0</div>
+          <div class="stat-label">Offers</div>
+        </div>
+      </div>
+
+      <!-- Search + Filter -->
+      <div class="search-bar">
+        <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search company or role…" autocomplete="off" />
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">Applications</span>
+        <select id="filter-status">
+          <option value="">All statuses</option>
+          <option value="applied">Applied</option>
+          <option value="phone_screen">Phone Screen</option>
+          <option value="interview">Interview</option>
+          <option value="offer">Offer</option>
+          <option value="rejected">Rejected</option>
+          <option value="ghosted">Ghosted</option>
+        </select>
+      </div>
+
+      <!-- Jobs list -->
+      <div id="jobs-list" class="jobs-list">
+        <div class="empty-state">
+          <p>No applications yet.</p>
+          <small>Click "+ Add Job" on any job board to start tracking.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ADD JOB SCREEN ───────────────────────────────── -->
+  <div id="add-screen" class="screen">
+    <div class="header">
+      <div class="header-logo">
+        <button id="add-back-btn" class="btn btn-ghost" style="padding:4px 6px">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        Add Application
+      </div>
+      <div class="header-actions">
+        <button id="autofill-btn" class="btn btn-primary btn-sm">
+          ✨ Auto-fill from page
+        </button>
+      </div>
+    </div>
+
+    <div class="add-body">
+      <div id="extract-status" class="extract-bar" style="display:none">
+        <span class="extract-icon">🤖</span>
+        <p id="extract-status-text">Reading page with Claude…</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="field-company">Company *</label>
+          <input type="text" id="field-company" placeholder="Acme Corp" />
+        </div>
+        <div class="form-group">
+          <label for="field-role">Role *</label>
+          <input type="text" id="field-role" placeholder="Software Engineer" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="field-location">Location</label>
+          <input type="text" id="field-location" placeholder="Remote / NYC" />
+        </div>
+        <div class="form-group">
+          <label for="field-pay">Compensation</label>
+          <input type="text" id="field-pay" placeholder="$120k–$150k" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="field-link">Job URL</label>
+        <input type="url" id="field-link" placeholder="https://..." />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="field-status">Status</label>
+          <select id="field-status">
+            <option value="applied">Applied</option>
+            <option value="phone_screen">Phone Screen</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+            <option value="ghosted">Ghosted</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="field-term">Term</label>
+          <select id="field-term"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="field-date">Applied Date</label>
+        <input type="date" id="field-date" />
+      </div>
+
+      <div class="form-group" id="field-reason-group" style="display:none">
+        <label for="field-reason">Reason</label>
+        <select id="field-reason">
+          <option value="">— Select reason —</option>
+          <option value="Role filled">Role filled</option>
+          <option value="Better candidates">Better candidates</option>
+          <option value="Skills mismatch">Skills mismatch</option>
+          <option value="Overqualified">Overqualified</option>
+          <option value="Underqualified">Underqualified</option>
+          <option value="No response">No response</option>
+          <option value="Withdrew">Withdrew application</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="field-notes">Notes</label>
+        <textarea id="field-notes" placeholder="Recruiter name, interview notes, referral…"></textarea>
+      </div>
+    </div>
+
+    <div class="add-footer">
+      <button id="save-job-btn" class="btn btn-primary btn-full">Save Application</button>
+      <button id="add-cancel-btn" class="btn btn-ghost">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ─── DETAIL / EDIT SCREEN ─────────────────────────── -->
+  <div id="detail-screen" class="screen">
+    <div class="header">
+      <div class="header-logo">
+        <button id="detail-back-btn" class="btn btn-ghost" style="padding:4px 6px">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span id="detail-title">Application</span>
+      </div>
+      <div class="header-actions">
+        <button id="detail-delete-btn" class="btn btn-ghost" title="Delete" style="color:var(--danger)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-company">Company</label>
+          <input type="text" id="edit-company" />
+        </div>
+        <div class="form-group">
+          <label for="edit-role">Role</label>
+          <input type="text" id="edit-role" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-location">Location</label>
+          <input type="text" id="edit-location" />
+        </div>
+        <div class="form-group">
+          <label for="edit-pay">Compensation</label>
+          <input type="text" id="edit-pay" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-link">Job URL</label>
+        <input type="url" id="edit-link" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-status">Status</label>
+          <select id="edit-status">
+            <option value="applied">Applied</option>
+            <option value="phone_screen">Phone Screen</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+            <option value="ghosted">Ghosted</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-term">Term</label>
+          <select id="edit-term"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-date">Applied Date</label>
+        <input type="date" id="edit-date" />
+      </div>
+
+      <div class="form-group" id="edit-reason-group" style="display:none">
+        <label for="edit-reason">Reason</label>
+        <select id="edit-reason">
+          <option value="">— Select reason —</option>
+          <option value="Role filled">Role filled</option>
+          <option value="Better candidates">Better candidates</option>
+          <option value="Skills mismatch">Skills mismatch</option>
+          <option value="Overqualified">Overqualified</option>
+          <option value="Underqualified">Underqualified</option>
+          <option value="No response">No response</option>
+          <option value="Withdrew">Withdrew application</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-notes">Notes</label>
+        <textarea id="edit-notes"></textarea>
+      </div>
+    </div>
+
+    <div class="detail-footer">
+      <button id="detail-save-btn" class="btn btn-primary btn-full">Save Changes</button>
+      <button id="detail-cancel-btn" class="btn btn-ghost">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
